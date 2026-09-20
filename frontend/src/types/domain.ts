@@ -46,6 +46,7 @@ export interface TrackPoint {
 
 export interface WorkRecord {
   id: string;
+  taskId?: string;
   machineCode: string;
   driverName: string;
   workDate: string;
@@ -54,6 +55,29 @@ export interface WorkRecord {
   fuelLiters: number;
   areaMu: number;
   fuelCost: number;
+}
+
+export interface CompleteTaskPayload {
+  actualHours: number;
+  fuelLiters: number;
+  areaMu: number;
+}
+
+export interface CompleteTaskResult {
+  taskId: string;
+  status: string;
+  recordId: string;
+  machineCode: string;
+  machineStatus: string;
+  remainingHours: number;
+  driverName: string;
+  driverStatus: string;
+  actualHours: number;
+  fuelLiters: number;
+  areaMu: number;
+  fuelCost: number;
+  maintenanceDue: boolean;
+  message: string;
 }
 
 export interface MaintenanceReminder {

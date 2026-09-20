@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { STATUS_COLORS } from '../constants/app.constants';
 import type { Driver } from '../types/domain';
 
 defineProps<{ drivers: Driver[] }>();
@@ -11,13 +12,14 @@ defineProps<{ drivers: Driver[] }>();
       <article v-for="driver in drivers" :key="driver.id" class="rounded-md border border-slate-200 p-3">
         <div class="flex items-center justify-between">
           <strong>{{ driver.name }}</strong>
-          <el-rate :model-value="driver.rating" disabled size="small" />
+          <el-tag :type="STATUS_COLORS[driver.status] ?? 'info'" size="small">{{ driver.status }}</el-tag>
         </div>
         <p class="mt-2 text-sm text-slate-600">{{ driver.licenseNo }}</p>
         <p class="text-sm text-slate-600">{{ driver.phone }}</p>
-        <p class="mt-2 text-sm text-emerald-700">
-          {{ driver.shift }} · 休 {{ driver.restDay }} · {{ driver.monthAreaMu }} 亩
-        </p>
+        <div class="mt-2 flex items-center justify-between text-sm text-emerald-700">
+          <span>{{ driver.shift }} · 休 {{ driver.restDay }} · {{ driver.monthAreaMu }} 亩</span>
+          <el-rate :model-value="driver.rating" disabled size="small" />
+        </div>
       </article>
     </div>
   </section>

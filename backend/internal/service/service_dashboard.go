@@ -3,11 +3,13 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log/slog"
 	"time"
 
 	"github.com/agridispatch/agridispatch/internal/constants"
+	apperrors "github.com/agridispatch/agridispatch/internal/errors"
 	"github.com/agridispatch/agridispatch/internal/model"
 	"github.com/agridispatch/agridispatch/internal/repository"
 	"github.com/redis/go-redis/v9"
@@ -52,13 +54,14 @@ func (s *DashboardService) Invalidate(ctx context.Context) {
 }
 
 // Dispatch 派单：将任务置为已派单，并同步更新农机状态为作业中。
+// 保养剩余时长归零、处于维修中的农机不允许继续派单。
 func (s *DashboardService) Dispatch(ctx context.Context, taskID string) (map[string]interface{}, error) {
 	task, err := s.repo.FindTask(taskID)
 	if err != nil {
 		return nil, err
 	}
 	if task.Status == constants.TaskDispatched || task.Status == constants.TaskDone {
-		return nil, fmt.Errorf("task %s is already %s", taskID, task.Status)
+		return nil, apperrors.NewConflict(fmt.Sprintf("任务 %s 当前状态为 %s，不能重复派单", taskID, task.Status))
 	}
 	if task.RecommendedMachine == "" {
 		task.RecommendedMachine = "NJ-2026-002"
@@ -67,19 +70,25 @@ func (s *DashboardService) Dispatch(ctx context.Context, taskID string) (map[str
 		task.RecommendedDriver = "何燕"
 	}
 
-	machine, err := s.repo.FindMachineByCode(task.RecommendedMachine)
-	if err != nil {
-		return nil, err
-	}
-	machine.Status = constants.MachineWorking
-	machine.CurrentTask = fmt.Sprintf("%s %s", task.Type, task.Field)
-	if err := s.repo.UpdateMachine(machine); err != nil {
+	if _, err := s.repo.FindMachineByCode(task.RecommendedMachine); err != nil {
 		return nil, err
 	}
 
-	task.Status = constants.TaskDispatched
-	if err := s.repo.UpdateTask(task); err != nil {
-		return nil, err
+	plan := &repository.DispatchPlan{
+		TaskID:             task.ID,
+		MachineCode:        task.RecommendedMachine,
+		MachineCurrentTask: fmt.Sprintf("%s %s", task.Type, task.Field),
+		DriverName:         task.RecommendedDriver,
+	}
+	if err := s.repo.ApplyDispatch(plan); err != nil {
+		switch {
+		case errors.Is(err, repository.ErrMachineBlocked):
+			return nil, apperrors.NewConflict(fmt.Sprintf("农机 %s 处于维修中，保养完成前不能派单", task.RecommendedMachine))
+		case errors.Is(err, repository.ErrTaskNotDispatchable):
+			return nil, apperrors.NewConflict(fmt.Sprintf("任务 %s 已被派单或完工，不能重复派单", taskID))
+		default:
+			return nil, err
+		}
 	}
 	s.Invalidate(ctx)
 	s.logger.Info("task dispatched", "taskId", taskID, "machine", task.RecommendedMachine, "driver", task.RecommendedDriver)

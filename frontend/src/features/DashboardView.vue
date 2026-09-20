@@ -13,9 +13,16 @@ import type { FarmOverview } from '../types/domain';
 
 const overview = ref<FarmOverview>();
 const loading = ref(true);
+const refreshing = ref(false);
 const error = ref('');
 
-onMounted(async () => {
+const loadOverview = async (silent = false) => {
+  if (silent) {
+    refreshing.value = true;
+  } else {
+    loading.value = true;
+  }
+  error.value = '';
   try {
     overview.value = await fetchFarmOverview();
     logger.info('farm overview loaded');
@@ -23,12 +30,22 @@ onMounted(async () => {
     error.value = err instanceof Error ? err.message : '加载失败';
   } finally {
     loading.value = false;
+    refreshing.value = false;
   }
-});
+};
+
+// 派单/完工后任务列表、作业统计与保养提醒同步刷新。
+const handleChanged = () => loadOverview(true);
+
+onMounted(() => loadOverview());
 </script>
 
 <template>
   <div class="mx-auto max-w-7xl space-y-5 px-6 py-6">
+    <div class="flex items-center justify-between">
+      <h1 class="text-xl font-black text-slate-800">调度看板</h1>
+      <el-button size="small" :loading="refreshing" @click="handleChanged">刷新</el-button>
+    </div>
     <el-alert v-if="error" :title="error" type="error" show-icon />
     <el-skeleton v-if="loading" :rows="8" animated />
 
@@ -41,11 +58,11 @@ onMounted(async () => {
       </section>
 
       <section class="grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
-        <TaskBoard :tasks="overview.tasks" />
+        <TaskBoard :tasks="overview.tasks" @changed="handleChanged" />
         <MapTrackPanel :tracks="overview.tracks" />
       </section>
 
-      <MachineTable :machines="overview.machines" />
+      <MachineTable :machines="overview.machines" :maintenance="overview.maintenance" />
 
       <section class="grid gap-4 lg:grid-cols-[1fr_0.9fr]">
         <RecordStats :records="overview.records" />

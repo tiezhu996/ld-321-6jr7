@@ -20,6 +20,7 @@ const swaggerJSON = `{
     "/auth/me": { "get": { "summary": "当前用户", "tags": ["auth"] } },
     "/dashboard/overview": { "get": { "summary": "调度看板总览", "tags": ["dashboard"] } },
     "/dashboard/tasks/{id}/dispatch": { "post": { "summary": "一键派单", "tags": ["dashboard"] } },
+    "/tasks/{id}/complete": { "post": { "summary": "任务完工登记（实际工时/油耗/作业面积）：结束任务、释放农机驾驶员、扣减保养剩余时长", "tags": ["tasks"] } },
     "/dashboard/reports/work/export": { "get": { "summary": "作业报表导出", "tags": ["dashboard"] } }
   }
 }`

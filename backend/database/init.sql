@@ -56,6 +56,7 @@ CREATE TABLE IF NOT EXISTS track_points (
 
 CREATE TABLE IF NOT EXISTS work_records (
   id VARCHAR(32) PRIMARY KEY,
+  task_id VARCHAR(32) DEFAULT '',
   machine_code VARCHAR(32) NOT NULL,
   driver_name VARCHAR(64) DEFAULT '',
   work_date VARCHAR(32) DEFAULT '',
@@ -65,7 +66,8 @@ CREATE TABLE IF NOT EXISTS work_records (
   area_mu DECIMAL(10,2) DEFAULT 0,
   fuel_cost DECIMAL(10,2) DEFAULT 0,
   created_at DATETIME(3) DEFAULT CURRENT_TIMESTAMP(3),
-  INDEX idx_record_machine (machine_code)
+  INDEX idx_record_machine (machine_code),
+  INDEX idx_record_task (task_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS maintenance_reminders (

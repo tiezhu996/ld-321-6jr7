@@ -127,7 +127,7 @@ func Seed(db *gorm.DB) error {
 	}
 	// 驾驶员
 	drivers := []model.Driver{
-		{ID: "d1", Name: "周明", LicenseNo: "A2-4101811990", Phone: "13800010001", Shift: "早班", RestDay: "周日", MonthAreaMu: 486, Rating: 4.8, Status: "在岗"},
+		{ID: "d1", Name: "周明", LicenseNo: "A2-4101811990", Phone: "13800010001", Shift: "早班", RestDay: "周日", MonthAreaMu: 486, Rating: 4.8, Status: "作业中"},
 		{ID: "d2", Name: "何燕", LicenseNo: "B2-4101811992", Phone: "13800010002", Shift: "中班", RestDay: "周三", MonthAreaMu: 318, Rating: 4.7, Status: "可派单"},
 		{ID: "d3", Name: "刘强", LicenseNo: "A1-4101811988", Phone: "13800010003", Shift: "夜班", RestDay: "周五", MonthAreaMu: 402, Rating: 4.6, Status: "休息"},
 	}

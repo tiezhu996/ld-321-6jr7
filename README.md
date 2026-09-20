@@ -88,6 +88,7 @@ go run ./cmd/server
 | GET | /auth/me | 当前用户 | JWT |
 | GET | /dashboard/overview | 调度看板总览（农机/任务/轨迹/统计/保养/驾驶员） | - |
 | POST | /dashboard/tasks/:id/dispatch | 一键派单（推荐空闲农机与驾驶员） | - |
+| POST | /tasks/:id/complete | 任务完工登记（实际工时/油耗/作业面积），结束任务、释放农机驾驶员、扣减保养剩余时长 | - |
 | GET | /dashboard/reports/work/export | 作业报表导出信息 | - |
 | GET | /ws | WebSocket 实时轨迹推送 | - |
 | GET | /healthz | 健康检查（DB + Redis） | - |

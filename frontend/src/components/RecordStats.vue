@@ -11,14 +11,17 @@ defineProps<{ records: WorkRecord[] }>();
       <el-button size="small">导出 Excel</el-button>
     </div>
     <el-table :data="records" size="small">
-      <el-table-column prop="workDate" label="日期" width="110" />
+      <el-table-column prop="workDate" label="日期" width="105" />
       <el-table-column prop="machineCode" label="农机" width="120" />
-      <el-table-column prop="driverName" label="驾驶员" width="90" />
-      <el-table-column prop="taskType" label="类型" width="90" />
-      <el-table-column prop="actualHours" label="工时" width="80" />
-      <el-table-column prop="fuelLiters" label="油耗/L" width="90" />
-      <el-table-column prop="areaMu" label="面积/亩" width="90" />
-      <el-table-column prop="fuelCost" label="油耗成本" />
+      <el-table-column prop="driverName" label="驾驶员" width="85" />
+      <el-table-column prop="taskType" label="类型" width="80" />
+      <el-table-column prop="actualHours" label="工时" width="75" />
+      <el-table-column prop="fuelLiters" label="油耗/L" width="85" />
+      <el-table-column prop="areaMu" label="面积/亩" width="85" />
+      <el-table-column prop="fuelCost" label="油耗成本" width="90" />
+      <el-table-column label="关联任务" min-width="100">
+        <template #default="{ row }">{{ row.taskId ?? '—' }}</template>
+      </el-table-column>
     </el-table>
   </section>
 </template>
