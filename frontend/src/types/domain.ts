@@ -18,6 +18,7 @@ export interface Machine {
   qrCode: string;
   photoUrl: string;
   workHours: number;
+  maintenanceRemainingHours: number;
   currentTask: string;
 }
 
@@ -32,6 +33,25 @@ export interface FarmTask {
   recommendedMachine: string;
   recommendedDriver: string;
   plannedWindow: string;
+  completedAt?: string | null;
+}
+
+export interface CompleteTaskPayload {
+  actualHours: number;
+  fuelLiters: number;
+  areaMu: number;
+}
+
+export interface CompleteTaskResult {
+  record: WorkRecord;
+  taskId: string;
+  taskStatus: string;
+  machineCode: string;
+  machineStatus: string;
+  remainingHours: number;
+  maintenanceDue: boolean;
+  driverName: string;
+  driverStatus: string;
 }
 
 export interface TrackPoint {
@@ -46,6 +66,7 @@ export interface TrackPoint {
 
 export interface WorkRecord {
   id: string;
+  taskId?: string | null;
   machineCode: string;
   driverName: string;
   workDate: string;

@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS machines (
   qr_code VARCHAR(64) DEFAULT '',
   photo_url VARCHAR(255) DEFAULT '',
   work_hours DECIMAL(10,2) DEFAULT 0,
+  maintenance_remaining_hours DECIMAL(8,2) DEFAULT 100.00,
   current_task VARCHAR(64) DEFAULT '',
   created_at DATETIME(3) DEFAULT CURRENT_TIMESTAMP(3)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -38,6 +39,7 @@ CREATE TABLE IF NOT EXISTS farm_tasks (
   recommended_machine VARCHAR(64) DEFAULT '',
   recommended_driver VARCHAR(64) DEFAULT '',
   planned_window VARCHAR(64) DEFAULT '',
+  completed_at DATETIME(3) NULL,
   created_at DATETIME(3) DEFAULT CURRENT_TIMESTAMP(3)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -56,6 +58,7 @@ CREATE TABLE IF NOT EXISTS track_points (
 
 CREATE TABLE IF NOT EXISTS work_records (
   id VARCHAR(32) PRIMARY KEY,
+  task_id VARCHAR(32) NULL UNIQUE,
   machine_code VARCHAR(32) NOT NULL,
   driver_name VARCHAR(64) DEFAULT '',
   work_date VARCHAR(32) DEFAULT '',

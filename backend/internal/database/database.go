@@ -16,7 +16,10 @@ func Connect(dsn string, maxOpen, maxIdle, connMaxLifetime, retryCount, retryInt
 	var db *gorm.DB
 	var err error
 	for i := 0; i <= retryCount; i++ {
-		db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{Logger: logger.Default.LogMode(logger.Warn)})
+		db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
+			Logger:         logger.Default.LogMode(logger.Warn),
+			TranslateError: true,
+		})
 		if err == nil {
 			if sqlDB, sqlErr := db.DB(); sqlErr == nil && sqlDB.Ping() == nil {
 				break
@@ -77,11 +80,11 @@ func Seed(db *gorm.DB) error {
 	if err := db.Create(&items).Error; err != nil {
 		return fmt.Errorf("seed items: %w", err)
 	}
-	// 农机
+	// 农机（MaintenanceRemainingHours 为保养剩余工时，与保养提醒初始值保持一致）
 	machines := []model.Machine{
-		{ID: "m1", Code: "NJ-2026-001", Name: "东方红 1804", Model: "LX1804", PurchasedAt: "2023-03-12", Horsepower: 180, Field: "北岭 1 号田", Status: "作业中", QRCode: "QR-NJ-001", PhotoURL: "/assets/machine-tractor.jpg", WorkHours: 284.5, CurrentTask: "春耕翻地"},
-		{ID: "m2", Code: "NJ-2026-002", Name: "雷沃谷神收割机", Model: "GE80S", PurchasedAt: "2022-09-18", Horsepower: 160, Field: "南湾稻田", Status: "空闲", QRCode: "QR-NJ-002", PhotoURL: "/assets/machine-harvester.jpg", WorkHours: 412.0, CurrentTask: "可派单"},
-		{ID: "m3", Code: "NJ-2026-003", Name: "中联履带拖拉机", Model: "RK140", PurchasedAt: "2024-01-06", Horsepower: 140, Field: "西坡旱地", Status: "维修中", QRCode: "QR-NJ-003", PhotoURL: "/assets/machine-crawler.jpg", WorkHours: 98.0, CurrentTask: "液压检修"},
+		{ID: "m1", Code: "NJ-2026-001", Name: "东方红 1804", Model: "LX1804", PurchasedAt: "2023-03-12", Horsepower: 180, Field: "北岭 1 号田", Status: "作业中", QRCode: "QR-NJ-001", PhotoURL: "/assets/machine-tractor.jpg", WorkHours: 284.5, MaintenanceRemainingHours: 16, CurrentTask: "春耕翻地"},
+		{ID: "m2", Code: "NJ-2026-002", Name: "雷沃谷神收割机", Model: "GE80S", PurchasedAt: "2022-09-18", Horsepower: 160, Field: "南湾稻田", Status: "空闲", QRCode: "QR-NJ-002", PhotoURL: "/assets/machine-harvester.jpg", WorkHours: 412.0, MaintenanceRemainingHours: 42, CurrentTask: "可派单"},
+		{ID: "m3", Code: "NJ-2026-003", Name: "中联履带拖拉机", Model: "RK140", PurchasedAt: "2024-01-06", Horsepower: 140, Field: "西坡旱地", Status: "维修中", QRCode: "QR-NJ-003", PhotoURL: "/assets/machine-crawler.jpg", WorkHours: 98.0, MaintenanceRemainingHours: 0, CurrentTask: "液压检修"},
 	}
 	if err := db.Create(&machines).Error; err != nil {
 		return fmt.Errorf("seed machines: %w", err)
@@ -125,9 +128,9 @@ func Seed(db *gorm.DB) error {
 	if err := db.Create(&reminders).Error; err != nil {
 		return fmt.Errorf("seed reminders: %w", err)
 	}
-	// 驾驶员
+	// 驾驶员（周明执行已派单任务 t1，初始为作业中；完工后自动恢复可派单）
 	drivers := []model.Driver{
-		{ID: "d1", Name: "周明", LicenseNo: "A2-4101811990", Phone: "13800010001", Shift: "早班", RestDay: "周日", MonthAreaMu: 486, Rating: 4.8, Status: "在岗"},
+		{ID: "d1", Name: "周明", LicenseNo: "A2-4101811990", Phone: "13800010001", Shift: "早班", RestDay: "周日", MonthAreaMu: 486, Rating: 4.8, Status: "作业中"},
 		{ID: "d2", Name: "何燕", LicenseNo: "B2-4101811992", Phone: "13800010002", Shift: "中班", RestDay: "周三", MonthAreaMu: 318, Rating: 4.7, Status: "可派单"},
 		{ID: "d3", Name: "刘强", LicenseNo: "A1-4101811988", Phone: "13800010003", Shift: "夜班", RestDay: "周五", MonthAreaMu: 402, Rating: 4.6, Status: "休息"},
 	}

@@ -15,16 +15,25 @@ const overview = ref<FarmOverview>();
 const loading = ref(true);
 const error = ref('');
 
-onMounted(async () => {
+// 派单 / 完工登记后重新拉取总览：任务列表、农机、作业统计、保养提醒随之同步。
+const loadOverview = async () => {
   try {
     overview.value = await fetchFarmOverview();
+    error.value = '';
     logger.info('farm overview loaded');
   } catch (err) {
     error.value = err instanceof Error ? err.message : '加载失败';
   } finally {
     loading.value = false;
   }
-});
+};
+
+const handleRefresh = () => {
+  loading.value = true;
+  void loadOverview();
+};
+
+onMounted(loadOverview);
 </script>
 
 <template>
@@ -41,7 +50,7 @@ onMounted(async () => {
       </section>
 
       <section class="grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
-        <TaskBoard :tasks="overview.tasks" />
+        <TaskBoard :tasks="overview.tasks" @refresh="handleRefresh" />
         <MapTrackPanel :tracks="overview.tracks" />
       </section>
 

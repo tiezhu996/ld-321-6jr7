@@ -27,6 +27,13 @@ defineProps<{ machines: Machine[] }>();
           <el-tag :type="STATUS_COLORS[row.status]" size="small">{{ row.status }}</el-tag>
         </template>
       </el-table-column>
+      <el-table-column label="保养剩余工时" width="130">
+        <template #default="{ row }">
+          <span :class="row.maintenanceRemainingHours <= 0 ? 'font-bold text-red-600' : ''">
+            {{ row.maintenanceRemainingHours }} h
+          </span>
+        </template>
+      </el-table-column>
       <el-table-column prop="qrCode" label="二维码" width="110" />
     </el-table>
   </section>

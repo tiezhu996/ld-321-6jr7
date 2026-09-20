@@ -2,9 +2,10 @@ package model
 
 import "time"
 
-// WorkRecord 作业记录。
+// WorkRecord 作业记录。每条记录对应一次任务完工登记，TaskID 唯一保证重复/并发完工只生成一条可追溯记录。
 type WorkRecord struct {
 	ID          string    `gorm:"primaryKey;size:32" json:"id"`
+	TaskID      *string   `gorm:"size:32;uniqueIndex" json:"taskId"`
 	MachineCode string    `gorm:"size:32;index" json:"machineCode"`
 	DriverName  string    `gorm:"size:64" json:"driverName"`
 	WorkDate    string    `gorm:"size:32" json:"workDate"`
@@ -13,7 +14,7 @@ type WorkRecord struct {
 	FuelLiters  float64   `json:"fuelLiters"`
 	AreaMu      float64   `json:"areaMu"`
 	FuelCost    float64   `json:"fuelCost"`
-	CreatedAt   time.Time `json:"-"`
+	CreatedAt   time.Time `json:"createdAt"`
 }
 
 // MaintenanceReminder 保养提醒。
@@ -30,16 +31,16 @@ type MaintenanceReminder struct {
 
 // Driver 驾驶员。
 type Driver struct {
-	ID           string    `gorm:"primaryKey;size:32" json:"id"`
-	Name         string    `gorm:"size:64" json:"name"`
-	LicenseNo    string    `gorm:"size:32" json:"licenseNo"`
-	Phone        string    `gorm:"size:32" json:"phone"`
-	Shift        string    `gorm:"size:16" json:"shift"`
-	RestDay      string    `gorm:"size:16" json:"restDay"`
-	MonthAreaMu  float64   `json:"monthAreaMu"`
-	Rating       float64   `json:"rating"`
-	Status       string    `gorm:"size:16" json:"status"`
-	CreatedAt    time.Time `json:"-"`
+	ID          string    `gorm:"primaryKey;size:32" json:"id"`
+	Name        string    `gorm:"size:64" json:"name"`
+	LicenseNo   string    `gorm:"size:32" json:"licenseNo"`
+	Phone       string    `gorm:"size:32" json:"phone"`
+	Shift       string    `gorm:"size:16" json:"shift"`
+	RestDay     string    `gorm:"size:16" json:"restDay"`
+	MonthAreaMu float64   `json:"monthAreaMu"`
+	Rating      float64   `json:"rating"`
+	Status      string    `gorm:"size:16" json:"status"`
+	CreatedAt   time.Time `json:"-"`
 }
 
 // DashboardItem 功能模块卡片。
